@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SummarAI</title>
+    
+    <!-- TailwindCSS + DaisyUI -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="bg-base-200">
+
+    <!-- Login Container -->
+    <div class="min-h-screen flex items-center justify-center p-4" x-data="loginApp()">
+        
+        <div class="card w-full max-w-md bg-base-100 shadow-2xl">
+            <div class="card-body">
+                
+                <!-- Logo -->
+                <div class="text-center mb-6">
+                    <a href="index.html" class="inline-block logo-container">
+                        <img src="assets/logo.svg" alt="SummarAI" class="w-20 h-20 mx-auto mb-3">
+                        <div class="text-2xl font-bold gradient-text">SummarAI</div>
+                    </a>
+                    <p class="text-gray-600 mt-2">Welcome back!</p>
+                </div>
+
+                <!-- Alert Messages -->
+                <div x-show="alert.show" x-transition class="alert mb-4" :class="alert.type === 'error' ? 'alert-error' : 'alert-success'">
+                    <span x-text="alert.message"></span>
+                </div>
+
+                <!-- Login Form -->
+                <form @submit.prevent="handleLogin">
+                    
+                    <!-- Email -->
+                    <div class="form-control mb-4">
+                        <label class="label">
+                            <span class="label-text">Email</span>
+                        </label>
+                        <input 
+                            type="email" 
+                            placeholder="your@email.com" 
+                            class="input input-bordered" 
+                            x-model="formData.email"
+                            required 
+                        />
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-control mb-4">
+                        <label class="label">
+                            <span class="label-text">Password</span>
+                        </label>
+                        <input 
+                            type="password" 
+                            placeholder="••••••••" 
+                            class="input input-bordered" 
+                            x-model="formData.password"
+                            required 
+                        />
+                        <label class="label">
+                            <a href="#" class="label-text-alt link link-hover">Forgot password?</a>
+                        </label>
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="form-control mb-6">
+                        <label class="label cursor-pointer justify-start gap-2">
+                            <input type="checkbox" class="checkbox checkbox-sm" x-model="formData.remember" />
+                            <span class="label-text">Remember me</span>
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button 
+                        type="submit" 
+                        class="btn btn-primary w-full mb-4"
+                        :disabled="loading"
+                    >
+                        <span x-show="!loading">
+                            <i class="fas fa-sign-in-alt mr-2"></i>
+                            Login
+                        </span>
+                        <span x-show="loading" class="loading loading-spinner"></span>
+                    </button>
+
+                </form>
+
+                <!-- Divider -->
+                <div class="divider">OR</div>
+
+                <!-- Register Link -->
+                <p class="text-center text-gray-600">
+                    Don't have an account? 
+                    <a href="register.html" class="link link-primary font-semibold">Sign up</a>
+                </p>
+
+                <!-- Back to Home -->
+                <div class="text-center mt-4">
+                    <a href="index.html" class="link link-hover text-sm text-gray-500">
+                        <i class="fas fa-arrow-left mr-1"></i>
+                        Back to home
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Alpine.js Login Logic -->
+    <script>
+        function loginApp() {
+            return {
+                formData: {
+                    email: '',
+                    password: '',
+                    remember: false
+                },
+                loading: false,
+                alert: {
+                    show: false,
+                    type: '',
+                    message: ''
+                },
+
+                async handleLogin() {
+                    this.loading = true;
+                    this.hideAlert();
+
+                    try {
+                        const response = await fetch('http://localhost:8000/auth/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                email: this.formData.email,
+                                password: this.formData.password
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            // Store token
+                            localStorage.setItem('token', data.access_token);
+                            localStorage.setItem('userEmail', this.formData.email);
+                            
+                            // Show success and redirect
+                            this.showAlert('success', 'Login successful! Redirecting...');
+                            
+                            setTimeout(() => {
+                                window.location.href = 'dashboard.html';
+                            }, 1000);
+                        } else {
+                            this.showAlert('error', data.detail || 'Login failed. Please check your credentials.');
+                        }
+                    } catch (error) {
+                        console.error('Login error:', error);
+                        this.showAlert('error', 'Connection error. Please make sure the API is running.');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                showAlert(type, message) {
+                    this.alert = { show: true, type, message };
+                },
+
+                hideAlert() {
+                    this.alert.show = false;
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>

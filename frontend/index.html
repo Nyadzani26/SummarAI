@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SummarAI - AI-Powered Document Summarization</title>
+    
+    <!-- TailwindCSS + DaisyUI -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="bg-white">
+    
+    <!-- Navigation -->
+    <nav class="navbar bg-base-100 shadow-lg px-8">
+        <div class="flex-1">
+            <a href="index.html" class="logo-container btn btn-ghost text-xl">
+                <img src="assets/logo.svg" alt="SummarAI Logo" class="logo-image">
+                <span class="text-xl font-bold gradient-text">SummarAI</span>
+            </a>
+        </div>
+        <div class="flex-none gap-2">
+            <a href="login.html" class="btn btn-ghost">Login</a>
+            <a href="register.html" class="btn btn-primary">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero min-h-screen bg-gradient-to-br from-white to-base-200">
+        <div class="hero-content text-center">
+            <div class="max-w-4xl">
+                <div class="mb-8">
+                    <img src="assets/logo.svg" alt="SummarAI" class="w-24 h-24 mx-auto mb-6 float">
+                    <h1 class="text-6xl font-bold text-black mb-4">
+                        Transform Documents into 
+                        <span class="gradient-text-animated">Insights</span>
+                    </h1>
+                </div>
+                <p class="text-xl text-gray-600 mb-8">
+                    Upload your documents and get AI-powered summaries in seconds. 
+                    Save time, boost productivity, and focus on what matters.
+                </p>
+                <div class="flex gap-4 justify-center">
+                    <a href="register.html" class="btn btn-primary btn-lg neon-blue shimmer">
+                        <i class="fas fa-rocket mr-2"></i>
+                        Start Free
+                    </a>
+                    <a href="#features" class="btn btn-outline btn-lg">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Learn More
+                    </a>
+                </div>
+                
+                <!-- Stats -->
+                <div class="stats stats-vertical lg:stats-horizontal shadow mt-12 glass-card">
+                    <div class="stat">
+                        <div class="stat-title">Processing Time</div>
+                        <div class="stat-value text-primary">~15s</div>
+                        <div class="stat-desc">Average per document</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-title">Compression</div>
+                        <div class="stat-value text-success">60%</div>
+                        <div class="stat-desc">Text reduction</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-title">Accuracy</div>
+                        <div class="stat-value text-info">95%</div>
+                        <div class="stat-desc">BART AI Model</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-8">
+            <h2 class="text-4xl font-bold text-center mb-4 text-black">Powerful Features</h2>
+            <p class="text-center text-gray-600 mb-12">Everything you need for intelligent document processing</p>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="card bg-base-100 shadow-xl card-gradient card-3d glass-card">
+                    <div class="card-body items-center text-center">
+                        <div class="text-5xl text-primary mb-4 feature-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <h3 class="card-title text-black">Easy Upload</h3>
+                        <p class="text-gray-600">
+                            Support for PDF, DOCX, and TXT files. 
+                            Drag & drop or click to upload.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="card bg-base-100 shadow-xl card-gradient card-3d glass-card">
+                    <div class="card-body items-center text-center">
+                        <div class="text-5xl text-success mb-4 feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3 class="card-title text-black">AI-Powered</h3>
+                        <p class="text-gray-600">
+                            BART model from Facebook AI creates 
+                            accurate, contextual summaries.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="card bg-base-100 shadow-xl card-gradient card-3d glass-card">
+                    <div class="card-body items-center text-center">
+                        <div class="text-5xl text-info mb-4 feature-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <h3 class="card-title text-black">Export Options</h3>
+                        <p class="text-gray-600">
+                            Download summaries as PDF, DOCX, or TXT.
+                            Email delivery coming soon.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="card bg-base-100 shadow-xl card-gradient card-3d glass-card">
+                    <div class="card-body items-center text-center">
+                        <div class="text-5xl text-warning mb-4 feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3 class="card-title text-black">Lightning Fast</h3>
+                        <p class="text-gray-600">
+                            Get your summaries in seconds, not hours.
+                            Optimized for performance.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="card bg-base-100 shadow-xl card-gradient card-3d glass-card">
+                    <div class="card-body items-center text-center">
+                        <div class="text-5xl text-error mb-4 feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="card-title text-black">Secure & Private</h3>
+                        <p class="text-gray-600">
+                            Your documents are encrypted and private.
+                            We never share your data.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="card bg-base-100 shadow-xl card-gradient card-3d glass-card">
+                    <div class="card-body items-center text-center">
+                        <div class="text-5xl text-secondary mb-4 feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="card-title text-black">Track Progress</h3>
+                        <p class="text-gray-600">
+                            View all your documents and summaries.
+                            Track usage statistics.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-20 bg-base-200">
+        <div class="container mx-auto px-8">
+            <h2 class="text-4xl font-bold text-center mb-4 text-black">How It Works</h2>
+            <p class="text-center text-gray-600 mb-12">Get started in 3 simple steps</p>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-4 neon-blue">
+                        1
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2 text-black">Upload Document</h3>
+                    <p class="text-gray-600">
+                        Choose your PDF, DOCX, or TXT file and upload it to our secure platform.
+                    </p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-success text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-4 neon-green">
+                        2
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2 text-black">AI Processing</h3>
+                    <p class="text-gray-600">
+                        Our BART AI model analyzes your document and creates an intelligent summary.
+                    </p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-info text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-4 neon-blue">
+                        3
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2 text-black">Get Results</h3>
+                    <p class="text-gray-600">
+                        View, download, or email your summary. It's that simple!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 gradient-primary text-white">
+        <div class="container mx-auto px-8 text-center">
+            <h2 class="text-4xl font-bold mb-4">Ready to Get Started?</h2>
+            <p class="text-xl mb-8 opacity-90">
+                Join thousands of users who are saving time with AI-powered summaries.
+            </p>
+            <a href="register.html" class="btn btn-lg bg-white text-primary hover:bg-base-100">
+                <i class="fas fa-user-plus mr-2"></i>
+                Create Free Account
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer footer-center p-10 bg-base-200 text-base-content">
+        <div>
+            <img src="assets/logo.svg" alt="SummarAI" class="w-16 h-16 mx-auto mb-2">
+            <div class="text-2xl font-bold gradient-text mb-2">SummarAI</div>
+            <p class="text-gray-600">AI-Powered Document Summarization</p>
+            <p class="text-gray-600"> 2025 SummarAI. All rights reserved.</p>
+        </div>
+        <div>
+            <div class="grid grid-flow-col gap-4">
+                <a class="link link-hover">About</a>
+                <a class="link link-hover">Contact</a>
+                <a class="link link-hover">Privacy Policy</a>
+                <a class="link link-hover">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

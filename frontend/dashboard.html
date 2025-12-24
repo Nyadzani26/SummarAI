@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SummarAI</title>
+    
+    <!-- TailwindCSS + DaisyUI -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="bg-base-200" x-data="dashboardApp()" x-init="init()">
+
+    <!-- Navigation -->
+    <nav class="navbar bg-base-100 shadow-lg px-8">
+        <div class="flex-1">
+            <a href="dashboard.html" class="logo-container btn btn-ghost text-xl">
+                <img src="assets/logo.svg" alt="SummarAI Logo" class="logo-image">
+                <span class="text-xl font-bold gradient-text">SummarAI</span>
+            </a>
+        </div>
+        <div class="flex-none gap-2">
+            <!-- Stats Badge -->
+            <div class="badge badge-primary badge-lg badge-premium neon-blue">
+                <i class="fas fa-file mr-1"></i>
+                <span x-text="stats.total_documents"></span> Documents
+            </div>
+            
+            <!-- User Menu -->
+            <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-ghost btn-circle avatar placeholder">
+                    <div class="bg-neutral text-neutral-content rounded-full w-10">
+                        <span class="text-xl" x-text="userInitial"></span>
+                    </div>
+                </label>
+                <ul tabindex="0" class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+                    <li class="menu-title">
+                        <span x-text="userEmail"></span>
+                    </li>
+                    <li><a @click="logout"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-4 max-w-7xl">
+
+        <!-- Alert Messages -->
+        <div x-show="alert.show" x-transition class="alert mb-4 alert-enter" :class="'alert-' + alert.type">
+            <span x-text="alert.message"></span>
+            <button @click="alert.show = false" class="btn btn-sm btn-ghost">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs tabs-boxed mb-6 bg-base-100 shadow-lg">
+            <a class="tab" :class="{ 'tab-active': currentTab === 'upload' }" @click="currentTab = 'upload'">
+                <i class="fas fa-cloud-upload-alt mr-2"></i>
+                Upload
+            </a>
+            <a class="tab" :class="{ 'tab-active': currentTab === 'documents' }" @click="currentTab = 'documents'; loadDocuments()">
+                <i class="fas fa-file-alt mr-2"></i>
+                Documents
+            </a>
+            <a class="tab" :class="{ 'tab-active': currentTab === 'summaries' }" @click="currentTab = 'summaries'; loadSummaries()">
+                <i class="fas fa-list-alt mr-2"></i>
+                Summaries
+            </a>
+        </div>
+
+        <!-- Upload Tab -->
+        <div x-show="currentTab === 'upload'" class="fade-in">
+            
+            <!-- Stats Cards -->
+            <div class="stats stats-vertical lg:stats-horizontal shadow mb-6 w-full glass-card">
+                <div class="stat">
+                    <div class="stat-figure text-primary">
+                        <i class="fas fa-file-alt text-3xl"></i>
+                    </div>
+                    <div class="stat-title">Total Documents</div>
+                    <div class="stat-value text-primary" x-text="stats.total_documents"></div>
+                    <div class="stat-desc" x-text="stats.total_words + ' words'"></div>
+                </div>
+                
+                <div class="stat">
+                    <div class="stat-figure text-success">
+                        <i class="fas fa-magic text-3xl"></i>
+                    </div>
+                    <div class="stat-title">Summaries Generated</div>
+                    <div class="stat-value text-success" x-text="summaries.length"></div>
+                    <div class="stat-desc">AI-powered</div>
+                </div>
+                
+                <div class="stat">
+                    <div class="stat-figure text-info">
+                        <i class="fas fa-database text-3xl"></i>
+                    </div>
+                    <div class="stat-title">Storage Used</div>
+                    <div class="stat-value text-info" x-text="stats.total_size_mb"></div>
+                    <div class="stat-desc">MB</div>
+                </div>
+            </div>
+
+            <!-- Upload Card -->
+            <div class="card bg-base-100 shadow-xl card-gradient glass-card">
+                <div class="card-body">
+                    <h2 class="card-title">
+                        <i class="fas fa-cloud-upload-alt mr-2"></i>
+                        Upload Document
+                    </h2>
+                    
+                    <!-- Drop Zone -->
+                    <div 
+                        class="dropzone"
+                        @dragover.prevent="isDragging = true"
+                        @dragleave.prevent="isDragging = false"
+                        @drop.prevent="handleDrop"
+                        @click="$refs.fileInput.click()"
+                        :class="{ 'dragover': isDragging }"
+                    >
+                        <i class="fas fa-cloud-upload-alt text-6xl text-gray-400 mb-4"></i>
+                        <p class="text-lg font-semibold mb-2">Drag & drop your file here</p>
+                        <p class="text-sm text-gray-500 mb-4">or click to browse</p>
+                        <p class="text-xs text-gray-400">Supported: PDF, DOCX, TXT (Max 10MB)</p>
+                        
+                        <input 
+                            type="file" 
+                            x-ref="fileInput" 
+                            @change="handleFileSelect" 
+                            accept=".pdf,.docx,.txt"
+                            class="hidden"
+                        />
+                    </div>
+
+                    <!-- Selected File Info -->
+                    <div x-show="selectedFile" class="alert alert-info mt-4">
+                        <i class="fas fa-file mr-2"></i>
+                        <span>
+                            <strong>Selected:</strong> 
+                            <span x-text="selectedFile?.name"></span>
+                            (<span x-text="formatFileSize(selectedFile?.size)"></span>)
+                        </span>
+                    </div>
+
+                    <!-- Upload Progress -->
+                    <div x-show="uploading" class="mt-4">
+                        <div class="flex items-center gap-4">
+                            <progress class="progress progress-primary w-full"></progress>
+                            <span class="text-sm">Uploading...</span>
+                        </div>
+                    </div>
+
+                    <!-- Upload Button -->
+                    <div class="card-actions justify-end mt-4">
+                        <button 
+                            class="btn btn-primary shimmer neon-blue" 
+                            @click="uploadDocument"
+                            :disabled="!selectedFile || uploading"
+                        >
+                            <i class="fas fa-upload mr-2"></i>
+                            Upload & Process
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents Tab -->
+        <div x-show="currentTab === 'documents'" class="fade-in">
+            
+            <!-- Loading -->
+            <div x-show="loading" class="flex justify-center py-20">
+                <span class="loading loading-spinner loading-lg"></span>
+            </div>
+
+            <!-- Documents Grid -->
+            <div x-show="!loading" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <template x-for="doc in documents" :key="doc.id">
+                    <div class="card bg-base-100 shadow-xl card-gradient card-3d glass-card">
+                        <div class="card-body">
+                            <h3 class="card-title text-sm">
+                                <i class="fas fa-file-alt text-primary"></i>
+                                <span class="truncate" x-text="doc.original_filename"></span>
+                            </h3>
+                            
+                            <div class="text-xs text-gray-500 space-y-1">
+                                <p><i class="fas fa-calendar mr-1"></i><span x-text="formatDate(doc.created_at)"></span></p>
+                                <p><i class="fas fa-text-width mr-1"></i><span x-text="doc.word_count"></span> words</p>
+                                <p><i class="fas fa-file mr-1"></i><span x-text="doc.file_type.toUpperCase()"></span></p>
+                            </div>
+
+                            <div class="card-actions justify-end mt-4">
+                                <button 
+                                    class="btn btn-sm btn-primary neon-blue"
+                                    @click="generateSummary(doc.id)"
+                                >
+                                    <i class="fas fa-magic mr-1"></i>
+                                    Summarize
+                                </button>
+                                <button 
+                                    class="btn btn-sm btn-ghost"
+                                    @click="deleteDocument(doc.id)"
+                                >
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Empty State -->
+            <div x-show="!loading && documents.length === 0" class="text-center py-20">
+                <i class="fas fa-folder-open text-6xl text-gray-300 mb-4"></i>
+                <p class="text-xl text-gray-500">No documents yet</p>
+                <button class="btn btn-primary mt-4" @click="currentTab = 'upload'">
+                    <i class="fas fa-upload mr-2"></i>
+                    Upload Your First Document
+                </button>
+            </div>
+        </div>
+
+        <!-- Summaries Tab -->
+        <div x-show="currentTab === 'summaries'" class="fade-in">
+            
+            <!-- Loading -->
+            <div x-show="loading" class="flex justify-center py-20">
+                <span class="loading loading-spinner loading-lg"></span>
+            </div>
+
+            <!-- Summaries List -->
+            <div x-show="!loading" class="space-y-4">
+                <template x-for="summary in summaries" :key="summary.id">
+                    <div class="card bg-base-100 shadow-xl summary-card card-gradient glass-card">
+                        <div class="card-body">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-lg mb-2">
+                                        <i class="fas fa-file-alt text-success mr-2"></i>
+                                        Summary #<span x-text="summary.id"></span>
+                                    </h3>
+                                    <p class="text-sm text-gray-600 mb-4" x-text="summary.summary_text"></p>
+                                    
+                                    <div class="flex gap-4 text-xs text-gray-500">
+                                        <span><i class="fas fa-calendar mr-1"></i><span x-text="formatDate(summary.created_at)"></span></span>
+                                        <span><i class="fas fa-text-width mr-1"></i><span x-text="summary.word_count"></span> words</span>
+                                        <span><i class="fas fa-compress mr-1"></i><span x-text="(summary.compression_ratio * 100).toFixed(0)"></span>% compression</span>
+                                        <span><i class="fas fa-clock mr-1"></i><span x-text="summary.generation_time"></span>s</span>
+                                    </div>
+                                </div>
+                                <button 
+                                    class="btn btn-sm btn-ghost"
+                                    @click="deleteSummary(summary.id)"
+                                >
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Empty State -->
+            <div x-show="!loading && summaries.length === 0" class="text-center py-20">
+                <i class="fas fa-magic text-6xl text-gray-300 mb-4"></i>
+                <p class="text-xl text-gray-500">No summaries yet</p>
+                <button class="btn btn-primary mt-4" @click="currentTab = 'documents'; loadDocuments()">
+                    <i class="fas fa-file mr-2"></i>
+                    View Documents
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Summary Generation Modal -->
+    <dialog x-ref="summaryModal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg mb-4">
+                <i class="fas fa-magic text-primary mr-2"></i>
+                Generating Summary...
+            </h3>
+            
+            <div x-show="generatingSummary" class="space-y-4">
+                <progress class="progress progress-primary w-full"></progress>
+                <p class="text-sm text-gray-600">
+                    This may take 10-30 seconds. The BART AI model is analyzing your document...
+                </p>
+                <div class="flex items-center gap-2 text-sm text-gray-500">
+                    <span class="loading loading-spinner loading-sm"></span>
+                    <span>Processing with AI...</span>
+                </div>
+            </div>
+
+            <div x-show="!generatingSummary && summaryResult" class="space-y-4">
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Summary generated successfully!
+                </div>
+
+                <div class="bg-base-200 p-4 rounded-lg">
+                    <p class="text-sm" x-text="summaryResult?.summary_text"></p>
+                </div>
+
+                <div class="stats stats-vertical lg:stats-horizontal shadow w-full">
+                    <div class="stat">
+                        <div class="stat-title">Words</div>
+                        <div class="stat-value text-sm" x-text="summaryResult?.word_count"></div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-title">Compression</div>
+                        <div class="stat-value text-sm" x-text="(summaryResult?.compression_ratio * 100).toFixed(0) + '%'"></div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-title">Time</div>
+                        <div class="stat-value text-sm" x-text="summaryResult?.generation_time + 's'"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-action">
+                <button class="btn" @click="closeSummaryModal">Close</button>
+                <button 
+                    x-show="!generatingSummary && summaryResult" 
+                    class="btn btn-primary"
+                    @click="currentTab = 'summaries'; loadSummaries(); closeSummaryModal()"
+                >
+                    View All Summaries
+                </button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <!-- Alpine.js Dashboard Logic -->
+    <script src="js/dashboard.js"></script>
+
+</body>
+</html>
